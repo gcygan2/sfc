@@ -10,6 +10,7 @@ const uint8_t bin_to_tran [] = {~_T1, ~_T2, ~_T3, ~_T4, ~_T5, ~_T6, ~_T7, ~_T8};
 volatile uint8_t y1_t=0, y2_t=0, t1=0, t2=0, t3=0, t4=0;
 volatile uint8_t y1_del=0, y2_del=0, t1_del=0, t2_del=0, t3_del=0, t4_del=0, clk_1hz=0;
 
+
 ISR (TIMER0_OVF_vect)
 {
 	static uint8_t tick;
@@ -96,7 +97,7 @@ void demo ()
 
 int main (){
 	uint8_t x0=1,x1=0,x2=0,x3=0,x4=0,x5=0;
-	uint8_t s1=0,s2=1, b1=0,c=0;
+	uint8_t s1=0,s2=1, b1=0, b2=0, c=0;
 
 	uint8_t h1=0,h2=0,y1=0,y2=0;
 	uint8_t h1_s=0,h2_s=0,y1_s=0,y2_s=0;
@@ -108,10 +109,10 @@ int main (){
 	DDR_OUT |= _H1|_H2|_Y1|_Y2;
 	DDR_X |= _X0|_X1|_X2|_X3|_X4|_X5;
 	
-	DDR_IN &= ~(_S1|_S2|_B1);
-	PORT_IN |= _S1|_S2|_B1;
+	DDR_IN &= ~(_S1|_S2|_B1|_B2);
+	PORT_IN |= _S1|_S2|_B1|_B2;
 	
-	usart_init();
+	//usart_init();
 	i2c_init();
 
 	TCCR0B |= (1<<CS02)|(1<<CS00);
@@ -121,11 +122,18 @@ int main (){
 
 	demo();
 
+	//PORT_OUT |= _H1;
+
+	//for (;;) {
+		
+	//}
+	
 	for (;;) {
 		input = PIN_IN;
 		s1 = (input & _S1)? 0:1;
 		s2 = (input & _S2)? 1:0;
 		b1 = (input & _B1)? 0:1;
+		b2 = (input & _B2)? 0:1;
 
 		tranzycja = 0;
 		zmiana = 0;
@@ -156,8 +164,8 @@ int main (){
 				zmiana = 1;
 				x1=0;
 				x3=1;
-				if (!t2_del) t2_del = 24; //D|t2
-				if (!y2_del) y2_del = 20; //L|Y2
+				if (!t2_del) t2_del = 10; //D|t2
+				if (!y2_del) y2_del = 4; //L|Y2
 				y1_t = 0;
 			}
 		}
@@ -168,8 +176,8 @@ int main (){
 				zmiana = 1;
 				x2=0;
 				x3=1;
-				if (!t2_del) t2_del = 24; //D|t2
-				if (!y2_del) y2_del = 20; //L|Y2
+				if (!t2_del) t2_del = 10; //D|t2
+				if (!y2_del) y2_del = 4; //L|Y2
 			}
 		} 
 		if(t2) {
@@ -191,7 +199,7 @@ int main (){
 				zmiana = 1;
 				x4=0;
 				x5=1;
-				if (!t4_del) t4_del = 24; //D|t3
+				if (!t4_del) t4_del = 20; //D|t3
 			}
 		} 
 		if (c < 4 && t3) {
@@ -240,10 +248,13 @@ int main (){
 		}
 		
 		if (y2 || (!y2_t && x3)) {
+			PORT_OUT |= _Y2H;
 			PORT_OUT |= _Y2;
 		} else {
-			PORT_OUT &= ~_Y2;
+			PORT_OUT &= ~_Y2H;
 		}
+
+		if (b2) PORT_OUT &= ~_Y2;
 
 		if (x0) {
 			PORT_X |= _X0;

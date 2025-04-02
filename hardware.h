@@ -20,14 +20,16 @@
 #define	DDR_OUT	DDRB
 #define	_H1	(1<<0)
 #define	_H2	(1<<2)
+#define	_Y2	(1<<1)
 #define	_Y1	(1<<3)
-#define	_Y2	(1<<4)
+#define	_Y2H	(1<<4)
 
 #define	PORT_IN PORTC
 #define	PIN_IN PINC
 #define	DDR_IN	DDRC
 #define	_S1	(1<<0)
 #define	_S2	(1<<1)
+#define	_B2	(1<<2)
 #define	_B1	(1<<3)
 
 #define __SEG_A (1<<6)
